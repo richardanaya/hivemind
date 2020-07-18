@@ -7,8 +7,9 @@ pub mod hivemind {
     tonic::include_proto!("hivemind");
 }
 
-#[derive(Debug, Default)]
-pub struct HivemindNode {}
+pub struct HivemindNode {
+    channel: flume::Sender<NodeRequest>,
+}
 
 #[tonic::async_trait]
 impl Hivemind for HivemindNode {
@@ -16,11 +17,8 @@ impl Hivemind for HivemindNode {
         &self,
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloReply>, Status> {
-        let reply = HelloReply {
-            message: format!("Hello {}!", request.into_inner().name),
-        };
-
-        Ok(Response::new(reply))
+        self.channel.send(NodeRequest::Hello);
+        Ok(Response::new(HelloReply {}))
     }
 
     async fn get_key_value(
@@ -42,9 +40,13 @@ impl Hivemind for HivemindNode {
     }
 }
 
-pub async fn start_server() {
+pub enum NodeRequest {
+    Hello,
+}
+
+pub async fn start_server(channel: flume::Sender<NodeRequest>) {
     let addr = "[::1]:50051".parse().unwrap();
-    let greeter = HivemindNode::default();
+    let greeter = HivemindNode { channel };
     Server::builder()
         .add_service(HivemindServer::new(greeter))
         .serve(addr)
@@ -68,7 +70,7 @@ impl HivemindNodeClient {
         });
 
         let response = self.grpc_client.say_hello(request).await.unwrap();
-        response.get_ref().message.clone()
+        "goodbye".to_string()
     }
 
     pub async fn get_key_value(&mut self, _key: &str) -> String {

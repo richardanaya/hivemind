@@ -12,8 +12,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match opts.subcmd {
         cli::SubCommand::Join(_t) => {
-            let server = tokio::task::spawn(grpc::start_server());
-            let client = tokio::task::spawn(node::start_node());
+            let (tx, rx) = flume::unbounded::<grpc::NodeRequest>();
+            let server = tokio::task::spawn(grpc::start_server(tx));
+            let peer = grpc::create_client().await;
+            let client = tokio::task::spawn(node::start_node(rx, Some(peer)));
             let http_server = tokio::task::spawn(web::start_web_server());
 
             server.await?;
@@ -21,8 +23,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             http_server.await?;
         }
         cli::SubCommand::Run(_t) => {
-            let server = tokio::task::spawn(grpc::start_server());
-            let client = tokio::task::spawn(node::start_node());
+            let (tx, rx) = flume::unbounded::<grpc::NodeRequest>();
+            let server = tokio::task::spawn(grpc::start_server(tx));
+            let client = tokio::task::spawn(node::start_node(rx, None));
             let http_server = tokio::task::spawn(web::start_web_server());
 
             server.await?;
