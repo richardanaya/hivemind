@@ -1,8 +1,8 @@
 use tonic::{transport::Server, Request, Response, Status};
 
-use hello_world::hivemind_server::{Hivemind, HivemindServer};
-use hello_world::hivemind_client::{HivemindClient};
-use hello_world::{HelloReply, HelloRequest};
+use hello_world::hivemind_client::*;
+use hello_world::hivemind_server::*;
+use hello_world::*;
 
 pub mod hello_world {
     tonic::include_proto!("hivemind");
@@ -25,6 +25,24 @@ impl Hivemind for HivemindNode {
 
         Ok(Response::new(reply))
     }
+
+    async fn get_key_value(
+        &self,
+        _request: Request<GetKeyValueRequest>,
+    ) -> Result<Response<GetKeyValueReply>, Status> {
+        Ok(Response::new(hello_world::GetKeyValueReply {
+            message: "foo".into(),
+        }))
+    }
+
+    async fn set_key_value(
+        &self,
+        _request: Request<SetKeyValueRequest>,
+    ) -> Result<Response<SetKeyValueReply>, Status> {
+        Ok(Response::new(hello_world::SetKeyValueReply {
+            message: "foo".into(),
+        }))
+    }
 }
 
 #[tokio::main]
@@ -46,9 +64,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let request = tonic::Request::new(HelloRequest {
                 name: "Tonic".into(),
             });
-        
+
             let response = client.say_hello(request).await.unwrap();
-        
+
             println!("RESPONSE={:?}", response);
             std::thread::sleep(std::time::Duration::from_secs(1));
         }

@@ -3,14 +3,31 @@ package hivemind;
 
 service Hivemind {
     rpc SayHello (HelloRequest) returns (HelloReply);
+    rpc GetKeyValue (GetKeyValueRequest) returns (GetKeyValueReply);
+    rpc SetKeyValue (SetKeyValueRequest) returns (SetKeyValueReply);
 }
 
 message HelloRequest {
-    // Request message contains the name to be greeted
     string name = 1;
 }
 
 message HelloReply {
-    // Reply contains the greeting message
+    string message = 1;
+}
+
+
+message GetKeyValueRequest {
+    string name = 1;
+}
+
+message GetKeyValueReply {
+    string message = 1;
+}
+
+message SetKeyValueRequest {
+    string name = 1;
+}
+
+message SetKeyValueReply {
     string message = 1;
 }
