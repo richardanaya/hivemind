@@ -9,6 +9,7 @@ use log::*;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
+    info!("starting");
     let opts = cli::Opts::parse();
 
     match opts.subcmd {
