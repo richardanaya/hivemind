@@ -1,7 +1,10 @@
+use clap::derive::Clap;
 use hello_world::hivemind_client::*;
 use hello_world::hivemind_server::*;
 use hello_world::*;
 use tonic::{transport::Server, Request, Response, Status};
+
+mod cli;
 
 pub mod hello_world {
     tonic::include_proto!("hivemind");
@@ -54,6 +57,25 @@ async fn hello(_: hyper::Request<hyper::Body>) -> Result<hyper::Response<hyper::
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let opts = cli::Opts::parse();
+
+    println!("Show verbose logs {}", opts.verbose);
+
+    // You can handle information about subcommands by requesting their matches by name
+    // (as below), requesting just the name used, or both at the same time
+    match opts.subcmd {
+        cli::SubCommand::Join(t) => println!(
+            "joining {} from {}:{}",
+            t.cluster_node_address, t.host, t.port
+        ),
+        cli::SubCommand::Run(t) => println!("running {}:{}", t.host, t.port),
+        cli::SubCommand::Get(t) => println!("getting key {} at {}", t.key, t.cluster_node_address),
+        cli::SubCommand::Set(t) => println!(
+            "setting key {} to value at {} of type {} at {}",
+            t.key, t.value, t.type_of_value, t.cluster_node_address
+        ),
+    }
+
     let server = tokio::task::spawn(async {
         let addr = "[::1]:50051".parse().unwrap();
         let greeter = HivemindNode::default();
