@@ -71,9 +71,9 @@ impl HivemindNodeClient {
         response.get_ref().message.clone()
     }
 
-    pub async fn get_key_value(&mut self, t: &str) -> String {
+    pub async fn get_key_value(&mut self, _key: &str) -> String {
         "foo".to_string()
     }
 
-    pub async fn set_key_value(&mut self, t: &str, v: &str) {}
+    pub async fn set_key_value(&mut self, _key: &str, _value: &str) {}
 }

@@ -4,7 +4,6 @@ mod node;
 mod web;
 
 use clap::derive::Clap;
-use log::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -12,7 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opts = cli::Opts::parse();
 
     match opts.subcmd {
-        cli::SubCommand::Join(t) => {
+        cli::SubCommand::Join(_t) => {
             let server = tokio::task::spawn(grpc::start_server());
             let client = tokio::task::spawn(node::start_node());
             let http_server = tokio::task::spawn(web::start_web_server());
@@ -21,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             client.await?;
             http_server.await?;
         }
-        cli::SubCommand::Run(t) => {
+        cli::SubCommand::Run(_t) => {
             let server = tokio::task::spawn(grpc::start_server());
             let client = tokio::task::spawn(node::start_node());
             let http_server = tokio::task::spawn(web::start_web_server());
