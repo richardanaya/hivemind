@@ -17,7 +17,7 @@ impl Hivemind for HivemindNode {
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloReply>, Status> {
         let reply = HelloReply {
-            message: format!("Hello {}!", request.into_inner().name).into(),
+            message: format!("Hello {}!", request.into_inner().name),
         };
 
         Ok(Response::new(reply))
