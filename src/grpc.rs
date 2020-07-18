@@ -70,4 +70,10 @@ impl HivemindNodeClient {
         let response = self.grpc_client.say_hello(request).await.unwrap();
         response.get_ref().message.clone()
     }
+
+    pub async fn get_key_value(&mut self, t: &str) -> String {
+        "foo".to_string()
+    }
+
+    pub async fn set_key_value(&mut self, t: &str, v: &str) {}
 }

@@ -9,29 +9,37 @@ use log::*;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    info!("starting");
     let opts = cli::Opts::parse();
 
     match opts.subcmd {
-        cli::SubCommand::Join(t) => println!(
-            "joining {} from {}:{}",
-            t.cluster_node_address, t.host, t.port
-        ),
-        cli::SubCommand::Run(t) => println!("running {}:{}", t.host, t.port),
-        cli::SubCommand::Get(t) => println!("getting key {} at {}", t.key, t.cluster_node_address),
-        cli::SubCommand::Set(t) => println!(
-            "setting key {} to value at {} of type {} at {}",
-            t.key, t.value, t.type_of_value, t.cluster_node_address
-        ),
+        cli::SubCommand::Join(t) => {
+            let server = tokio::task::spawn(grpc::start_server());
+            let client = tokio::task::spawn(node::start_node());
+            let http_server = tokio::task::spawn(web::start_web_server());
+
+            server.await?;
+            client.await?;
+            http_server.await?;
+        }
+        cli::SubCommand::Run(t) => {
+            let server = tokio::task::spawn(grpc::start_server());
+            let client = tokio::task::spawn(node::start_node());
+            let http_server = tokio::task::spawn(web::start_web_server());
+
+            server.await?;
+            client.await?;
+            http_server.await?;
+        }
+        cli::SubCommand::Get(t) => {
+            let mut client = grpc::create_client().await;
+            let key_value = client.get_key_value(&t.key).await;
+            println!("{}", key_value);
+        }
+        cli::SubCommand::Set(t) => {
+            let mut client = grpc::create_client().await;
+            client.set_key_value(&t.key, &t.value).await
+        }
     }
-
-    let server = tokio::task::spawn(grpc::start_server());
-    let client = tokio::task::spawn(node::start_node());
-    let http_server = tokio::task::spawn(web::start_web_server());
-
-    server.await?;
-    client.await?;
-    http_server.await?;
 
     Ok(())
 }
