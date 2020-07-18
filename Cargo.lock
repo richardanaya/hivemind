@@ -193,6 +193,7 @@ dependencies = [
 name = "hivemind"
 version = "0.0.0"
 dependencies = [
+ "hyper",
  "prost",
  "tokio",
  "tonic",

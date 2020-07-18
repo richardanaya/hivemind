@@ -12,6 +12,7 @@ description = "A simple distribute key value store"
 tonic = "0.3"
 prost = "0.6"
 tokio = { version = "0.2", features = ["macros"] }
+hyper = "0"
 
 [build-dependencies]
 tonic-build = "0.3"

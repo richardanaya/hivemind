@@ -1,8 +1,7 @@
-use tonic::{transport::Server, Request, Response, Status};
-
 use hello_world::hivemind_client::*;
 use hello_world::hivemind_server::*;
 use hello_world::*;
+use tonic::{transport::Server, Request, Response, Status};
 
 pub mod hello_world {
     tonic::include_proto!("hivemind");
@@ -45,6 +44,14 @@ impl Hivemind for HivemindNode {
     }
 }
 
+use std::convert::Infallible;
+
+use hyper::service::{make_service_fn, service_fn};
+
+async fn hello(_: hyper::Request<hyper::Body>) -> Result<hyper::Response<hyper::Body>, Infallible> {
+    Ok(hyper::Response::new(hyper::Body::from("Hello World!")))
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server = tokio::task::spawn(async {
@@ -72,8 +79,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
+    let http_server = tokio::task::spawn(async {
+        let addr = ([127, 0, 0, 1], 3000).into();
+        let server = hyper::Server::bind(&addr).serve(make_service_fn(|_conn| async {
+            Ok::<_, Infallible>(service_fn(hello))
+        }));
+        server.await.unwrap();
+    });
+
     server.await?;
     client.await?;
+    http_server.await?;
 
     Ok(())
 }
