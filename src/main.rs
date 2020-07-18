@@ -4,9 +4,11 @@ mod node;
 mod web;
 
 use clap::derive::Clap;
+use log::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
     let opts = cli::Opts::parse();
 
     match opts.subcmd {
