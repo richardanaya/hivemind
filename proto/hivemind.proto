@@ -32,7 +32,7 @@ message SetKeyValueReply {
 
 
 message JoinClusterRequest {
-    string port = 1;
+    int32 port = 1;
 }
 
 message PeersReply {

@@ -60,7 +60,7 @@ pub struct RunNode {
 
     /// Port of local node
     #[clap(short, default_value = "9900")]
-    pub port: u16,
+    pub port: i32,
 
     /// Run web monitor
     #[clap(short)]
@@ -79,7 +79,7 @@ pub struct JoinCluster {
 
     /// Port of local node
     #[clap(short, default_value = "9900")]
-    pub port: u16,
+    pub port: i32,
 
     /// Run web monitor
     #[clap(short)]

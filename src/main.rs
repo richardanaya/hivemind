@@ -19,7 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 tokio::task::spawn(node::start_node(
                     rx,
                     Some(grpc::create_client(cmd.cluster_node_address).await),
-                    &cmd.port
+                    cmd.port
                 )),
                 tokio::task::spawn(web::start_web_server(cmd.web_monitor))
             );
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let (tx, rx) = flume::unbounded::<node::NodeRequest>();
             join!(
                 tokio::task::spawn(grpc::start_server(cmd.host, cmd.port, tx)),
-                tokio::task::spawn(node::start_node(rx, None, &cmd.port)),
+                tokio::task::spawn(node::start_node(rx, None, cmd.port)),
                 tokio::task::spawn(web::start_web_server(cmd.web_monitor))
             );
         }

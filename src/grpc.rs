@@ -38,7 +38,7 @@ impl Hivemind for HivemindNode {
     ) -> Result<Response<Empty>, Status> {
         self.channel.send(NodeRequest::JoinCluster(
             req.remote_addr(),
-            req.get_ref().port.clone(),
+            req.get_ref().port,
         ));
         Ok(Response::new(Empty {}))
     }
@@ -61,7 +61,7 @@ impl Hivemind for HivemindNode {
     }
 }
 
-pub async fn start_server(host: String, port: u16, channel: flume::Sender<NodeRequest>) {
+pub async fn start_server(host: String, port: i32, channel: flume::Sender<NodeRequest>) {
     let addr = format!("{}:{}", host, port).parse().unwrap();
     println!("Running hivemind server at http://{}", addr);
     let greeter = HivemindNode { channel };
@@ -83,14 +83,12 @@ pub struct HivemindNodeClient {
 }
 
 impl HivemindNodeClient {
-    pub async fn join_cluster(&mut self, port: &str) {
-        let request = tonic::Request::new(hivemind::JoinClusterRequest {
-            port: port.to_string(),
-        });
+    pub async fn join_cluster(&mut self, port: i32) {
+        let request = tonic::Request::new(hivemind::JoinClusterRequest { port });
         self.grpc_client.join_cluster(request).await;
     }
 
-    pub async fn get_peers(&mut self, port: &str) {
+    pub async fn get_peers(&mut self) {
         let request = tonic::Request::new(hivemind::Empty {});
         self.grpc_client.get_peers(request).await;
     }
