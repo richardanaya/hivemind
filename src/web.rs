@@ -5,7 +5,11 @@ async fn hello(_: hyper::Request<hyper::Body>) -> Result<hyper::Response<hyper::
     Ok(hyper::Response::new(hyper::Body::from("Hello World!")))
 }
 
-pub async fn start_web_server() {
+pub async fn start_web_server(active: bool) {
+    if !active {
+        return;
+    }
+    println!("starting webserver at http://127.0.0.1:3000");
     let addr = ([127, 0, 0, 1], 3000).into();
     let server = hyper::Server::bind(&addr).serve(make_service_fn(|_conn| async {
         Ok::<_, Infallible>(service_fn(hello))

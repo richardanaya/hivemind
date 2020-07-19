@@ -16,7 +16,7 @@ pub async fn start_node(
         if let Some(client) = &mut peer {
             println!("sending hello");
             client.say_hello("foo").await;
-            std::thread::sleep(std::time::Duration::from_secs(1));
         }
+        tokio::task::yield_now().await;
     }
 }

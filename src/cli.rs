@@ -61,6 +61,10 @@ pub struct RunNode {
     /// Port of local node
     #[clap(short, default_value = "9900")]
     pub port: u16,
+
+    /// Run web monitor
+    #[clap(short)]
+    pub web_monitor: bool,
 }
 
 /// Join a cluster of hivemind nodes
@@ -76,4 +80,8 @@ pub struct JoinCluster {
     /// Port of local node
     #[clap(short, default_value = "9900")]
     pub port: u16,
+
+    /// Run web monitor
+    #[clap(short)]
+    pub web_monitor: bool,
 }

@@ -47,8 +47,8 @@ pub enum NodeRequest {
 }
 
 pub async fn start_server(host: String, port: u16, channel: flume::Sender<NodeRequest>) {
-    let addr =  format!("{}:{}",host,port).parse().unwrap();
-    println!("Running hivemind server at http://{}",addr);
+    let addr = format!("{}:{}", host, port).parse().unwrap();
+    println!("Running hivemind server at http://{}", addr);
     let greeter = HivemindNode { channel };
     Server::builder()
         .add_service(HivemindServer::new(greeter))
@@ -58,7 +58,7 @@ pub async fn start_server(host: String, port: u16, channel: flume::Sender<NodeRe
 }
 
 pub async fn create_client(target: String) -> HivemindNodeClient {
-    println!("Attempting to join hivemind node {}",target);
+    println!("Attempting to join hivemind node {}", target);
     let c = HivemindClient::connect(target).await.unwrap();
     HivemindNodeClient { grpc_client: c }
 }
