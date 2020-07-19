@@ -44,8 +44,8 @@ pub enum NodeRequest {
     Hello,
 }
 
-pub async fn start_server(channel: flume::Sender<NodeRequest>) {
-    let addr = "[::1]:50051".parse().unwrap();
+pub async fn start_server(host: String, port: u16, channel: flume::Sender<NodeRequest>) {
+    let addr = format!("{}:{}", host, port).parse().unwrap();
     let greeter = HivemindNode { channel };
     Server::builder()
         .add_service(HivemindServer::new(greeter))
@@ -54,8 +54,8 @@ pub async fn start_server(channel: flume::Sender<NodeRequest>) {
         .unwrap();
 }
 
-pub async fn create_client() -> HivemindNodeClient {
-    let c = HivemindClient::connect("http://[::1]:50051").await.unwrap();
+pub async fn create_client(target: String) -> HivemindNodeClient {
+    let c = HivemindClient::connect(target).await.unwrap();
     HivemindNodeClient { grpc_client: c }
 }
 
@@ -77,5 +77,5 @@ impl HivemindNodeClient {
         "foo".to_string()
     }
 
-    pub async fn set_key_value(&mut self, _key: &str, _value: &str) {}
+    pub async fn set_key_value(&mut self, _key: &str, _value: &str, _value_type: &str) {}
 }

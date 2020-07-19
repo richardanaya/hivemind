@@ -44,7 +44,7 @@ pub struct SetKey {
 
     /// Type of value
     #[clap(short)]
-    pub type_of_value: String,
+    pub value_type: String,
 
     /// Address of cluster node
     #[clap(short)]
@@ -60,14 +60,13 @@ pub struct RunNode {
 
     /// Port of local node
     #[clap(short)]
-    pub port: String,
+    pub port: u16,
 }
 
 /// Join a cluster of hivemind nodes
 #[derive(Clap)]
 pub struct JoinCluster {
     /// Address of cluster node
-    #[clap(short)]
     pub cluster_node_address: String,
 
     /// Host of local node
@@ -76,5 +75,5 @@ pub struct JoinCluster {
 
     /// Port of local node
     #[clap(short)]
-    pub port: String,
+    pub port: u16,
 }
