@@ -6,7 +6,7 @@ service Hivemind {
     rpc SetKeyValue (SetKeyValueRequest) returns (SetKeyValueReply);
     rpc JoinCluster(JoinClusterRequest) returns (Empty);
     rpc AcceptedIntoCluster(Empty) returns (Empty);
-    rpc Peers(Empty) returns (Empty);
+    rpc GetPeers(Empty) returns (Empty);
     rpc NotifyPeers(PeersReply) returns (Empty);
 }
 

@@ -49,7 +49,7 @@ impl Hivemind for HivemindNode {
         Ok(Response::new(Empty {}))
     }
 
-    async fn peers(&self, req: Request<Empty>) -> Result<Response<Empty>, Status> {
+    async fn get_peers(&self, req: Request<Empty>) -> Result<Response<Empty>, Status> {
         self.channel.send(NodeRequest::Peers(req.remote_addr()));
         Ok(Response::new(Empty {}))
     }
@@ -83,13 +83,16 @@ pub struct HivemindNodeClient {
 }
 
 impl HivemindNodeClient {
-    pub async fn say_hello(&mut self, t: &str) {
+    pub async fn join_cluster(&mut self, port: &str) {
         let request = tonic::Request::new(hivemind::JoinClusterRequest {
-            port: t.to_string(),
+            port: port.to_string(),
         });
-
         self.grpc_client.join_cluster(request).await;
-        println!("done");
+    }
+
+    pub async fn get_peers(&mut self, port: &str) {
+        let request = tonic::Request::new(hivemind::Empty {});
+        self.grpc_client.get_peers(request).await;
     }
 
     pub async fn get_key_value(&mut self, _key: &str) -> String {

@@ -1,5 +1,4 @@
 use crate::grpc::HivemindNodeClient;
-use log::*;
 use std::net::SocketAddr;
 
 pub enum NodeRequest {
@@ -10,20 +9,34 @@ pub enum NodeRequest {
 }
 
 pub async fn start_node(
-    channel: flume::Receiver<NodeRequest>,
+    requests_channel: flume::Receiver<NodeRequest>,
     mut peer: Option<HivemindNodeClient>,
+    local_node_port: &str,
 ) {
     loop {
-        match channel.try_recv() {
+        match requests_channel.try_recv() {
             Ok(r) => {
-                info!("received a hello");
+                match r {
+                    NodeRequest::JoinCluster(source, port) => {
+                        // handle request to join cluster ...
+                    }
+                    NodeRequest::AcceptedIntoCluster(source) => {
+                        // handle acceptace into cluster ...
+                    }
+                    NodeRequest::Peers(source) => {
+                        // handle request for my peers ...
+                    }
+                    NodeRequest::NotifyPeers(source) => {
+                        // handle notification of peers ...
+                    }
+                }
             }
             Err(flume::TryRecvError::Empty) => {}
             Err(flume::TryRecvError::Disconnected) => return,
         }
         if let Some(client) = &mut peer {
-            println!("sending hello");
-            client.say_hello("foo").await;
+            // if we have a peer the user has asked us to join, try to send request to join cluster
+            client.join_cluster(local_node_port).await;
         }
         tokio::task::yield_now().await;
     }
