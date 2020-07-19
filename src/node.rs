@@ -1,5 +1,13 @@
-use crate::grpc::{HivemindNodeClient, NodeRequest};
+use crate::grpc::HivemindNodeClient;
 use log::*;
+use std::net::SocketAddr;
+
+pub enum NodeRequest {
+    JoinCluster(Option<SocketAddr>, String),
+    AcceptedIntoCluster(Option<SocketAddr>),
+    Peers(Option<SocketAddr>),
+    NotifyPeers(Option<SocketAddr>),
+}
 
 pub async fn start_node(
     channel: flume::Receiver<NodeRequest>,

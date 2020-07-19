@@ -2,18 +2,17 @@ syntax = "proto3";
 package hivemind;
 
 service Hivemind {
-    rpc SayHello (HelloRequest) returns (HelloReply);
     rpc GetKeyValue (GetKeyValueRequest) returns (GetKeyValueReply);
     rpc SetKeyValue (SetKeyValueRequest) returns (SetKeyValueReply);
+    rpc JoinCluster(JoinClusterRequest) returns (Empty);
+    rpc AcceptedIntoCluster(Empty) returns (Empty);
+    rpc Peers(Empty) returns (Empty);
+    rpc NotifyPeers(PeersReply) returns (Empty);
 }
 
-message HelloRequest {
-    string name = 1;
-}
+message Empty {
 
-message HelloReply {
 }
-
 
 message GetKeyValueRequest {
     string name = 1;
@@ -29,4 +28,13 @@ message SetKeyValueRequest {
 
 message SetKeyValueReply {
     string message = 1;
+}
+
+
+message JoinClusterRequest {
+    string port = 1;
+}
+
+message PeersReply {
+    repeated string peers = 1;
 }

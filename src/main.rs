@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match opts.subcmd {
         cli::SubCommand::Join(cmd) => {
-            let (tx, rx) = flume::unbounded::<grpc::NodeRequest>();
+            let (tx, rx) = flume::unbounded::<node::NodeRequest>();
             join!(
                 tokio::task::spawn(grpc::start_server(cmd.host, cmd.port, tx)),
                 tokio::task::spawn(node::start_node(
@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
         }
         cli::SubCommand::Run(cmd) => {
-            let (tx, rx) = flume::unbounded::<grpc::NodeRequest>();
+            let (tx, rx) = flume::unbounded::<node::NodeRequest>();
             join!(
                 tokio::task::spawn(grpc::start_server(cmd.host, cmd.port, tx)),
                 tokio::task::spawn(node::start_node(rx, None)),

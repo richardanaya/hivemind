@@ -1,3 +1,4 @@
+use crate::node::NodeRequest;
 use hivemind::hivemind_client::*;
 use hivemind::hivemind_server::*;
 use hivemind::*;
@@ -13,19 +14,9 @@ pub struct HivemindNode {
 
 #[tonic::async_trait]
 impl Hivemind for HivemindNode {
-    async fn say_hello(
-        &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
-        println!("received hello");
-        self.channel.send(NodeRequest::Hello);
-        println!("sent to channel hello");
-        Ok(Response::new(HelloReply {}))
-    }
-
     async fn get_key_value(
         &self,
-        _request: Request<GetKeyValueRequest>,
+        _req: Request<GetKeyValueRequest>,
     ) -> Result<Response<GetKeyValueReply>, Status> {
         Ok(Response::new(GetKeyValueReply {
             message: "foo".into(),
@@ -34,16 +25,40 @@ impl Hivemind for HivemindNode {
 
     async fn set_key_value(
         &self,
-        _request: Request<SetKeyValueRequest>,
+        _req: Request<SetKeyValueRequest>,
     ) -> Result<Response<SetKeyValueReply>, Status> {
         Ok(Response::new(SetKeyValueReply {
             message: "foo".into(),
         }))
     }
-}
 
-pub enum NodeRequest {
-    Hello,
+    async fn join_cluster(
+        &self,
+        req: Request<JoinClusterRequest>,
+    ) -> Result<Response<Empty>, Status> {
+        self.channel.send(NodeRequest::JoinCluster(
+            req.remote_addr(),
+            req.get_ref().port.clone(),
+        ));
+        Ok(Response::new(Empty {}))
+    }
+
+    async fn accepted_into_cluster(&self, req: Request<Empty>) -> Result<Response<Empty>, Status> {
+        self.channel
+            .send(NodeRequest::AcceptedIntoCluster(req.remote_addr()));
+        Ok(Response::new(Empty {}))
+    }
+
+    async fn peers(&self, req: Request<Empty>) -> Result<Response<Empty>, Status> {
+        self.channel.send(NodeRequest::Peers(req.remote_addr()));
+        Ok(Response::new(Empty {}))
+    }
+
+    async fn notify_peers(&self, req: Request<PeersReply>) -> Result<Response<Empty>, Status> {
+        self.channel
+            .send(NodeRequest::NotifyPeers(req.remote_addr()));
+        Ok(Response::new(Empty {}))
+    }
 }
 
 pub async fn start_server(host: String, port: u16, channel: flume::Sender<NodeRequest>) {
@@ -69,11 +84,11 @@ pub struct HivemindNodeClient {
 
 impl HivemindNodeClient {
     pub async fn say_hello(&mut self, t: &str) {
-        let request = tonic::Request::new(hivemind::HelloRequest {
-            name: t.to_string(),
+        let request = tonic::Request::new(hivemind::JoinClusterRequest {
+            port: t.to_string(),
         });
 
-        self.grpc_client.say_hello(request).await;
+        self.grpc_client.join_cluster(request).await;
         println!("done");
     }
 
