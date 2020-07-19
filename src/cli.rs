@@ -55,11 +55,11 @@ pub struct SetKey {
 #[derive(Clap)]
 pub struct RunNode {
     /// Host of node
-    #[clap(short)]
+    #[clap(short, default_value = "127.0.0.1")]
     pub host: String,
 
     /// Port of local node
-    #[clap(short)]
+    #[clap(short, default_value = "9900")]
     pub port: u16,
 }
 
@@ -70,10 +70,10 @@ pub struct JoinCluster {
     pub cluster_node_address: String,
 
     /// Host of local node
-    #[clap(short)]
+    #[clap(short, default_value = "127.0.0.1")]
     pub host: String,
 
     /// Port of local node
-    #[clap(short)]
+    #[clap(short, default_value = "9900")]
     pub port: u16,
 }

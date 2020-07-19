@@ -14,8 +14,8 @@ pub async fn start_node(
             Err(flume::TryRecvError::Disconnected) => return,
         }
         if let Some(client) = &mut peer {
-            let response = client.say_hello("foo").await;
-            info!("{}", response);
+            println!("sending hello");
+            client.say_hello("foo").await;
             std::thread::sleep(std::time::Duration::from_secs(1));
         }
     }
